@@ -1,0 +1,8 @@
+prefix=/home/ty/picar_ws/devel
+
+Name: webcam
+Description: Description of webcam
+Version: 0.0.0
+Cflags: 
+Libs: -L/home/ty/picar_ws/devel/lib 
+Requires: 

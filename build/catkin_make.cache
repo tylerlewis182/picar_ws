@@ -1,0 +1,2 @@
+gps
+-DCATKIN_DEVEL_PREFIX=/home/ty/picar_ws/devel -DCMAKE_INSTALL_PREFIX=/home/ty/picar_ws/install -G Unix Makefiles

@@ -1,0 +1,2 @@
+# ignore GPS log files
+src/gps/generic_scripts/gps_logger/gps_logs/
