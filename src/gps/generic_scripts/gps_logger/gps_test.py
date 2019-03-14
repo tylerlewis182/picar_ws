@@ -127,9 +127,6 @@ GPS_PORT = get_serial_port('gps') # "/dev/ttyUSB0"
 GPS_BAUDRATE = 9600
 
 
-
-
-
 # try to open serial port
 try:
 	gps = serial.Serial(GPS_PORT, baudrate=GPS_BAUDRATE)
@@ -144,8 +141,6 @@ except Exception as e:
 	print(e)
 
 
-
-
 # if serial port opens successfully
 else:
 	print("Successfully connected to GPS sensor at port: {}".format(GPS_PORT))
@@ -156,31 +151,31 @@ else:
 	try:
 		while True:
 
-				# save each NMEA sentence in string 'line'
-				line = gps.readline() # line: $GPGSA,A,3,17,06,12,19,28,24,,,,,,,1.71,1.46,0.89*00
+			# save each NMEA sentence in string 'line'
+			line = gps.readline() # line: $GPGSA,A,3,17,06,12,19,28,24,,,,,,,1.71,1.46,0.89*00
 
-				# split string on commas to seperate NMEA items. store items in list 'data'
-				data = line.split(",") # data: ['$GPGSA', 'A', '3', '17', '06', '12', '19', '28', '24', '', '', '', '', '', '', '2.48', '1.52', '1.96*03\r\n']
-				
-				# extract only lines that begin with '$GPRMC'
-				if data[0] == "$GPRMC":
+			# split string on commas to seperate NMEA items. store items in list 'data'
+			data = line.split(",") # data: ['$GPGSA', 'A', '3', '17', '06', '12', '19', '28', '24', '', '', '', '', '', '', '2.48', '1.52', '1.96*03\r\n']
+			
+			# extract only lines that begin with '$GPRMC'
+			if data[0] == "$GPRMC":
 
-					# ensure that the NMEA sentence is valid (A == OK, V == invalid)
-					if data[2] == "A":
-						
-						# store current latitude and longitude (format == ??? decimal ???)
-						latitude  = data[3]
-						longitude = data[5]
+				# ensure that the NMEA sentence is valid (A == OK, V == invalid)
+				if data[2] == "A":
+					
+					# store current latitude and longitude (format == Degrees, Decimal Minutes)
+					latitude  = data[3]
+					longitude = data[5]
 
-						print("Latitude:  {}".format(latitude))
-						print("Longitude: {}".format(longitude))
-						print("---")
+					print("Latitude:  {}".format(latitude))
+					print("Longitude: {}".format(longitude))
+					print("---")
 
-						# expected print output looks similar to this:
-						#
-						#		Latitude:  3342.7315
-						#		Longitude: 09635.6702
-						#		---
+					# expected print output looks similar to this:
+					#
+					#		Latitude:  3342.7315
+					#		Longitude: 09635.6702
+					#		---
 
 	except KeyboardInterrupt as e:
 		print("KeyboardInterrupt. Program shutting down.")
@@ -189,19 +184,3 @@ else:
 	except Exception as e:
 		print("Error! Something went wrong with GPS sensor.")
 		print(e)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
