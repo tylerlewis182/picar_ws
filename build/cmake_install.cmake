@@ -116,6 +116,7 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
+  include("/home/ty/picar_ws/build/arduino/cmake_install.cmake")
   include("/home/ty/picar_ws/build/gps/cmake_install.cmake")
 
 endif()
