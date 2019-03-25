@@ -2,6 +2,7 @@
 
 import rospy
 import time
+from Servo import Servo 
 from std_msgs.msg import String
 from std_msgs.msg import UInt16
 
@@ -26,57 +27,12 @@ TODO: Reverse does not work...
 '''
 
 
-
-
-# servo class
 ''' 
 NOTES:
  1900 == max left 
  1500 == straight
  1100 == max right
 '''
-# servo class
-class Servo:
-	def __init__(self, mid_position=1500, max_position=1550, min_position=1450):
-
-		self.position = mid_position
-		self.prev_position = self.position - 1 
-		self.mid_position = mid_position
-		self.max_position = max_position
-		self.min_position = min_position
-		self.direction = 'ccw'
-		self.step_size = 5 # servo adjustments step by this amount
-		
-	
-	def sweep_position(self): 
-		''' increments or decrements servo value by 1 '''
-
-		# if at max_left, swap current and previous positions
-		if self.position >= self.max_position:
-			self.position -= self.step_size
-			self.prev_position += self.step_size
-			self.direction = 'cw'
-
-		# if at max_right, swap current and previous positions
-		elif self.position <= self.min_position:
-			self.position += self.step_size
-			self.prev_position -= self.step_size
-			self.direction = 'ccw'
-
-		# if turning servo clockwise
-		elif self.direction == 'cw':
-			self.position -= self.step_size
-			self.prev_position -= self.step_size
-
-		# if turning servo counter clockwise
-		elif self.direction == 'ccw':
-			self.position += self.step_size
-			self.prev_position += self.step_size
-
-	def reset(self):
-		self.position = self.mid_position
-		self.prev_position = self.position - 1 
-		self.direction = 'ccw'
 		
 
 # main
@@ -89,24 +45,61 @@ if __name__=='__main__':
 	pub = rospy.Publisher("/throttle_servo_position", UInt16, queue_size=10)
 
 	# create a rate object
-	rate = rospy.Rate(10) # Hz
+	rate1 = rospy.Rate(0.5) # Hz
+	rate2 = rospy.Rate(0.5) # Hz
 
 	# create a Servo object
 	throttle_servo = Servo()
 
 	# load parameter (this parameter should be set in launch file)
-	runtime = rospy.get_param("runtime", 10.0) # default value is 10 (http://wiki.ros.org/rospy/Overview/Parameter%20Server)
-	start_time = time.time()
-	elapsed_time = time.time() - start_time
+	runcount = rospy.get_param("runcount", 3) # default value is 10 (http://wiki.ros.org/rospy/Overview/Parameter%20Server)
+	stopped_speed = rospy.get_param("stopped_speed", 1500) # default value is 10 (http://wiki.ros.org/rospy/Overview/Parameter%20Server)
+	forward_speed = rospy.get_param("forward_speed", 1550) # default value is 10 (http://wiki.ros.org/rospy/Overview/Parameter%20Server)
+	reverse_speed = rospy.get_param("reverse_speed", 1450) # default value is 10 (http://wiki.ros.org/rospy/Overview/Parameter%20Server)
+	iterations = 0
 
-	# while this node is running, sweep the steering back and forth
-	while not rospy.is_shutdown():
-		throttle_servo.sweep_position()
-		msg = UInt16()
+	# make the car go forward and backward 'runcount' times
+	msg = UInt16()
+	throttle_servo.set_position(1500) # stop
+	msg.data = throttle_servo.position
+	pub.publish(msg)
+	rate1.sleep() 
+
+	while iterations < runcount:
+		throttle_servo.set_position(1550) # go forward
 		msg.data = throttle_servo.position
 		pub.publish(msg)
-		rate.sleep()
+		rate1.sleep() 
 
+		throttle_servo.set_position(1500) # stop
+		msg.data = throttle_servo.position
+		pub.publish(msg)
+		rate1.sleep() 
+
+		throttle_servo.set_position(1400) # trigger reverse (car won't actually move)
+		msg.data = throttle_servo.position
+		pub.publish(msg)
+		rate2.sleep() 
+		throttle_servo.set_position(1500) # trigger reverse (car won't actually move)
+		msg.data = throttle_servo.position
+		pub.publish(msg)
+		rate2.sleep() 
+
+		throttle_servo.set_position(1400) # go reverse
+		msg.data = throttle_servo.position
+		pub.publish(msg)
+		rate1.sleep() 
+
+		throttle_servo.set_position(1500) # stop
+		msg.data = throttle_servo.position
+		pub.publish(msg)
+		rate1.sleep() 
+
+		iterations += 1
+
+	throttle_servo.set_position(1500) # stop
+	msg.data = throttle_servo.position
+	pub.publish(msg)
 		# for debugging
 		#rospy.loginfo("position: {}".format(steering_servo.position))
 		#rospy.loginfo("prev    : {}".format(steering_servo.prev_position))

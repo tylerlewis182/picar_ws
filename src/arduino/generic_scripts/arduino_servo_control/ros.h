@@ -15,7 +15,7 @@ namespace ros
 
 
   // default is 25, 25, 512, 512  
-  typedef NodeHandle_<ArduinoHardware, 3, 0, 128, 256> NodeHandle;
+  typedef NodeHandle_<ArduinoHardware, 2, 2, 128, 256> NodeHandle;
 
 
   // This is legal too and will use the default 25, 25, 512, 512
